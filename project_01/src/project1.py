@@ -52,18 +52,20 @@ y_val   = ss_y.transform(y_val  )
 lr = LinearRegression();
 lr.fit(x_train, y_train);
 b_lr , w_lr = lr.intercept_[0], lr.coef_[0][0]
-y_pred = b_lr + x_train*w_lr;
-mse = (( y_pred-y_train)**2).mean()
+y_pred = b_lr + x_val*w_lr;
+mse = (( y_pred-y_val)**2).mean()
 print(f"[LR] b: {b_lr:.4} w: {w_lr:.4} msg: {mse:.4}");
 
 x_lr = np.linspace( min(x_train), max(x_train), 10 );
 y_lr = b_lr + (x_lr*w_lr);
 
 plt.figure()
-plt.scatter( x_train, y_train, color='blue', label='Training',   s=5 );
+#plt.scatter( x_train, y_train, color='blue', label='Training',   s=5 );
+plt.scatter( x_val, y_val, color='red', label='Validation',   s=5 );
 plt.plot( x_lr, y_lr, color='black', label='Linear Regression', linewidth=3 );
 plt.title("Golden Prediction");
 plt.grid(True);
+plt.legend();
 plt.savefig(f"{FIGURES_DIR}/linear_regression.png");
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -101,8 +103,8 @@ N_ITR = 1000;
 for itr in range(N_ITR):
     b_rand = np.random.randn();
     w_rand = np.random.randn();
-    y_pred = b_rand + x_train*w_rand;
-    mse = (( y_pred-y_train)**2).mean()
+    y_pred = b_rand + x_val*w_rand;
+    mse = (( y_pred-y_val)**2).mean()
     if( mse < best_mse ):
         iterations.append([b_rand, w_rand, float(mse)]);
         best_mse = mse;
@@ -137,8 +139,8 @@ for N_ITR in [ 1000, 2000, 5000, 10000 ]:
     for itr in range(N_ITR):
         b_rand = np.random.randn();
         w_rand = np.random.randn();
-        y_pred = b_rand + x_train*w_rand;
-        mse = (( y_pred-y_train)**2).mean()
+        y_pred = b_rand + x_val*w_rand;
+        mse = (( y_pred-y_val)**2).mean()
         if( mse < best_mse ):
             iterations.append([b_rand, w_rand, float(mse)]);
             best_mse = mse;
