@@ -1,0 +1,22 @@
+\newpage
+\section{Part E}
+\label{sec:sec_e}
+
+Comparing the naive approach to gradient decent it can be seen that both, given enough iterations, will converge towards the "golden" variable values. However the naive approach will traverse a non-deterministic path, unlike gradient decent. Additionally, gradient decent (assuming reasonable hyper parameters) will improve it's MSE after each iteration. As was shown in the naive approach, only a small percentage of the iterations actually improve the MSE.
+
+Lastly consider the impact of increasing the number of iterations when running the naive algorithm. The below table shows the algorithm's results for four different iteration numbers. It can be seen that as the number of iterations increase the MSE decreases, however this is only the \textit{probabilistically likely} outcome of increasing iterations and not a guarantee due to the inherent randomness of the algorithm. Furthermore, it can be seen that the final computed values of \textit{b} and \textit{w} are not always closer to the "golden" values than their predecessors with fewer iterations, even if the overall MSE is lower.   
+
+\begin{center}
+\begin{tabular}{||c|c|c|c|c|c||}
+	\hline
+	Iterations & \# of Hits & \# of Misses & Final \textit{b} & Final \textit{w} & Final MSE \\
+	\hline
+	1000 & 4 & 996 & 0.02445 & 1.024 & 0.05297 \\
+	2000 & 8 & 1992 & 0.03465 & 0.9427 & 0.05059 \\
+	5000 & 8 & 4992 & -0.01179 & 0.9886 & 0.04949 \\
+	10000 & 11 & 9989 & 0.002239 & 0.9824 & 0.04911 \\
+	\hline
+\end{tabular}
+\end{center}
+
+\LST{part\_e}
