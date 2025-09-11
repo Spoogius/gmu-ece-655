@@ -127,10 +127,9 @@ ax.set_xlabel('b');
 ax.set_ylabel('w');
 ax.set_title('Loss Surface');
 ax.view_init(40, 260);
-plt.legend(fontsize="small");
 
-ax = fig.add_subplot( 122, projection='3d')
-ax.plot_surface( b_surf, w_surf, loss_surf, rstride=1, cstride=1, alpha=.5, cmap=plt.cm.jet, linewidth=0, antialiased=True);
+ax = fig.add_subplot( 122 )
+# ax.plot_surface( b_surf, w_surf, loss_surf, rstride=1, cstride=1, alpha=.5, cmap=plt.cm.jet, linewidth=0, antialiased=True);
 ax.scatter(b_lr, w_lr, color='red', s=20, label="Golden");
 ax.scatter(iterations[0][0], iterations[0][1], color='blue', s=40, label="Initial");
 ax.scatter(iterations[1:-1:,0], iterations[1:-1:,1,], color='black', s=20, label="Iterations");
@@ -140,7 +139,8 @@ ax.set_ylabel('w');
 ax.set_xlim(-1, 1 );
 ax.set_ylim(0, 2);
 ax.set_title('Loss Surface');
-ax.view_init(90, 0);
+plt.grid(True);
+plt.legend(fontsize="small");
 plt.savefig(f"{FIGURES_DIR}/loss_surface_naive.png");
 
 
