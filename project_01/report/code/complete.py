@@ -74,7 +74,7 @@ plt.savefig(f"{FIGURES_DIR}/linear_regression.png");
 
 b_depth = 3;
 w_depth = 3;
-b_range = np.linspace( b_lr - b_depth, b_lr + b_depth, 100 ); 
+b_range = np.linspace( b_lr - b_depth, b_lr + b_depth, 100 );
 w_range = np.linspace( w_lr - w_depth, b_lr + w_depth, 100 );
 b_surf, w_surf = np.meshgrid( b_range, w_range );
 y_surf = np.apply_along_axis( func1d=lambda x: b_surf + w_surf*x,
@@ -87,7 +87,8 @@ loss_surf = (all_errors**2).mean(axis=0);
 
 fig = plt.figure();
 ax = fig.add_subplot( 111, projection='3d')
-ax.plot_surface( b_surf, w_surf, loss_surf, rstride=1, cstride=1, alpha=.5, cmap=plt.cm.jet, linewidth=0, antialiased=True); 
+ax.plot_surface( b_surf, w_surf, loss_surf, rstride=1, cstride=1, alpha=.5, cmap=plt.cm.jet, linewidth=0, antialiased=True);
+ax.scatter(b_lr, w_lr, color='red', s=20);
 ax.set_xlabel('b');
 ax.set_ylabel('w');
 ax.set_title('Loss Surface');
@@ -112,22 +113,38 @@ for itr in range(N_ITR):
 iterations = np.array(iterations);
 print(f"[Naive] b: {iterations[-1][0]:.4}, w: {iterations[-1][1]:.4}, mse: {iterations[-1][2]:.4}");
 
-fig = plt.figure();
-ax = fig.add_subplot( 111, projection='3d')
-
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Part D
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+fig = plt.figure();
+ax = fig.add_subplot( 121, projection='3d')
 ax.plot_surface( b_surf, w_surf, loss_surf, rstride=1, cstride=1, alpha=.5, cmap=plt.cm.jet, linewidth=0, antialiased=True);
-ax.scatter(b_lr, w_lr, color='red', s=20); 
-ax.scatter(iterations[0][0], iterations[0][1], color='blue', s=40); 
-ax.scatter(iterations[1:-1:,0], iterations[1:-1:,1,], color='black', s=20);
-ax.scatter(iterations[-1][0], iterations[-1][1], color='blue', s=40); 
+ax.scatter(b_lr, w_lr, color='red', s=20, label="Golden");
+ax.scatter(iterations[0][0], iterations[0][1], color='blue', s=40, label="Initial");
+ax.scatter(iterations[1:-1:,0], iterations[1:-1:,1,], color='black', s=20, label="Iterations");
+ax.scatter(iterations[-1][0], iterations[-1][1], color='blue', s=40, label="Final");
 ax.set_xlabel('b');
 ax.set_ylabel('w');
 ax.set_title('Loss Surface');
-ax.view_init(40, 260)
+ax.view_init(40, 260);
+plt.legend(fontsize="small");
+
+ax = fig.add_subplot( 122, projection='3d')
+ax.plot_surface( b_surf, w_surf, loss_surf, rstride=1, cstride=1, alpha=.5, cmap=plt.cm.jet, linewidth=0, antialiased=True);
+ax.scatter(b_lr, w_lr, color='red', s=20, label="Golden");
+ax.scatter(iterations[0][0], iterations[0][1], color='blue', s=40, label="Initial");
+ax.scatter(iterations[1:-1:,0], iterations[1:-1:,1,], color='black', s=20, label="Iterations");
+ax.scatter(iterations[-1][0], iterations[-1][1], color='blue', s=40, label="Final");
+ax.set_xlabel('b');
+ax.set_ylabel('w');
+ax.set_xlim(-1, 1 );
+ax.set_ylim(0, 2);
+ax.set_title('Loss Surface');
+ax.view_init(90, 0);
 plt.savefig(f"{FIGURES_DIR}/loss_surface_naive.png");
+
+
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Part E
