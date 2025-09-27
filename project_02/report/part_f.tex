@@ -1,0 +1,21 @@
+\newpage
+\section{Part F}
+\label{sec:sec_f}
+
+Lastly, the regression parameters were relearned using \textit{PyTorch}. Again the training was computed for $500$ epochs and a learning rate of $0.01$ was used. Table~\ref{tbl:cmr} compares final learned results of the two approaches. Since the learned parameters \textit{b} and \textit{w} are nearly identical to the previous described \textit{NumPy} method the resulting fit line would look nearly identical to that in Figure~\ref{fig:fit}. 
+
+\begin{table}[h!]
+	\centering
+\begin{tabular}{||c|c|c|c|c||}
+		\hline
+		Method & Learned \textit{b} & Learned \textit{w} & Training Loss (MSE) & Validation Loss (MSE) \\
+		\hline
+		NumPy & -15.2738 & 15.50911 & 0.00153235 & 0.0013943 \\
+		PyTorch & -15.2738 & 15.5109 & 0.00153235 & 0.0013934\\
+		\hline
+\end{tabular}
+\caption{Numpy vs PyTorch Linear Regression Results}
+\label{tbl:cmr}
+\end{table}
+
+\LST{part\_f}

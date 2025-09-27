@@ -43,9 +43,10 @@ v_d = v_s - v_r;
 
 
 plt.figure();
-plt.scatter(v_d, i_d );
+plt.scatter(v_d,1000* i_d );
 #plt.scatter(v_d, np.log(i_d) );
-
+plt.xlabel("V_d (V)");
+plt.ylabel("I_d (mA)");
 
 dataset = np.empty((N,3));
 dataset[:,0] = v_d;
@@ -55,7 +56,7 @@ dataset[:,2] = np.log(i_d);
 # ----------------------------------
 #          Part B
 # ----------------------------------
-N = dataset.shape[0];
+N = 50;
 idx = np.arange(N);
 np.random.shuffle(idx);
 
@@ -75,9 +76,10 @@ x_train = ss_x.transform(x_train)
 x_val   = ss_x.transform(x_val  )
 
 
-# plt.figure();
-# #plt.scatter(v_d, i_d );
-# plt.scatter(x_train, y_train );
+#plt.figure();
+#plt.scatter(v_d, i_d );
+#plt.scatter(x_train, 1000*i_d[val_idx].reshape(-1,1));
+
 
 
 # ----------------------------------
@@ -86,14 +88,13 @@ x_val   = ss_x.transform(x_val  )
 
 lr = 0.01;
 n_epochs= 500;
-
+loss = np.empty((500,));
 b = np.random.randn(1);
 w = np.random.randn(1);
 for epoch in range(n_epochs):
     y_hat = b + w * x_train;
     err = (y_hat - y_train);
-    loss = (err**2).mean();
-    #print(f"[{epoch}] b={b}    w={w}    Loss={loss}");
+    loss[epoch] = (err**2).mean();
     
     b_grad = 2*err.mean();
     w_grad = 2*(x_train*err).mean();
@@ -101,6 +102,13 @@ for epoch in range(n_epochs):
     b = b - lr*b_grad;
     w = w - lr*w_grad;
 
+print(f"[Epoch {n_epochs}] Loss={loss[n_epochs-1]}")
+
+plt.figure();
+plt.plot(range(n_epochs), loss );
+plt.ylabel("Loss (MSE)");
+plt.xlabel("Epoch");
+#plt.scatter(x_train, 1000*i_d[val_idx].reshape(-1,1));
 # ----------------------------------
 #          Part D
 # ----------------------------------
@@ -123,11 +131,14 @@ x_lr = np.linspace( min(ss_x.inverse_transform(x_train)), max(ss_x.inverse_trans
 y_lr = b_plt + (x_lr*w_plt);
 plt.figure();
 # plt.scatter(ss_x.inverse_transform(x_train), y_train, label="Training Data" );
-plt.scatter(ss_x.inverse_transform(x_train), np.e**y_train, label="Training Data" );
+plt.scatter(ss_x.inverse_transform(x_train), 1000*np.e**y_train, color="blue", label="Training Data" );
+plt.scatter(ss_x.inverse_transform(x_val), 1000*np.e**y_val, color="red", label="Validation Data" );
 plt.yscale("log");
-plt.plot( x_lr, np.e**y_lr, '--', color='black', label='Linear Regression', linewidth=2 );
+plt.plot( x_lr, 1000*np.e**y_lr, '--', color='black', label='Linear Regression', linewidth=1 );
 plt.legend();
-#plt.scatter(x_train, y_train );
+plt.xlabel("V_d (V)");
+plt.ylabel("I_d (mA)");
+
 
 print(f"Manual LR:\n  Normalized:   b: {b[0]:10.6f} w:{w[0]:10.6f}\n  Unnormalized: b: {b_plt[0]:10.6f} w: {w_plt[0]:10.6f}\n")
 
@@ -158,7 +169,6 @@ optimizer=optim.SGD(model.parameters(), lr=lr)
 loss_fn=nn.MSELoss(reduction='mean')
 
 for epoch in range(n_epochs):
-    
     model.train()
     yhat = model(x_train_tensor)
     loss = loss_fn(yhat, y_train_tensor)
@@ -166,6 +176,7 @@ for epoch in range(n_epochs):
     optimizer.step()
     optimizer.zero_grad()
 
+print(f"[Epoch {n_epochs}] Loss={loss}")
 P=list(model.parameters())
 bt=float(P[0].detach())
 wt=float(P[1].detach())
