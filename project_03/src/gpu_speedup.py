@@ -51,32 +51,6 @@ def train(X, y, device, num_epochs=1000, lr=0.03):
     return end - start, loss.item()
 
 
-
-def train_with_batches(X, y, device, num_epochs=5, lr=0.03, batch_size=65536):
-    dataset = TensorDataset(X, y.unsqueeze(1))
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
-
-    model = LinearRegressionModel(X.shape[1]).to(device)
-    criterion = nn.MSELoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=lr)
-
-    start = time.time()
-    for epoch in range(num_epochs):
-        for xb, yb in dataloader:
-            xb = xb.to(device, non_blocking=True)
-            yb = yb.to(device, non_blocking=True)
-
-            optimizer.zero_grad()
-            pred = model(xb)
-            loss = criterion(pred, yb)
-            loss.backward()
-            optimizer.step()
-    torch.cuda.synchronize() if device.type == 'cuda' else None
-    end = time.time()
-
-    return end - start, loss.item()
-
-
 # Hyperparameters
 num_samples = 1_000_000  # Bigger dataset to emphasize GPU
 num_features = 50
@@ -97,13 +71,3 @@ if torch.cuda.is_available():
 else:
     print("\nCUDA not available. Skipping GPU run.")
 
-# Run on CPU
-cpu_time, cpu_loss = train_with_batches(X, y, device_cpu)
-print(f"\n[CPU] Mini Batch  Time: {cpu_time:.2f}s | Final Loss: {cpu_loss:.4f}")
-
-# Run on GPU if available
-if torch.cuda.is_available():
-    gpu_time, gpu_loss = train_with_batches(X, y, device_gpu)
-    print(f"[GPU] Mini Batch Time: {gpu_time:.2f}s | Final Loss: {gpu_loss:.4f}")
-else:
-    print("\nCUDA not available. Skipping GPU run.")
