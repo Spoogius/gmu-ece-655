@@ -1,0 +1,15 @@
+\newpage
+\section{Part E}
+\label{sec:sec_e}
+
+In this experiment we consider how changing the batch size impacts the training. 
+
+\LST{part\_e}
+
+It can be seen in Figure~\ref{fig:e loss} that the final training and validations losses are not the same depending on the batch sizes. For this specific dataset with 331 training samples after the split a batch size of 16 produced the best final loss values.
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/e_loss.png}
+	\caption{Fianl Losses with (\textbf{SGD}, \textbf{MSE}, \textbf{Variable Batch Size})}
+	\label{fig:e loss}
+\end{figure}
