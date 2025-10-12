@@ -1,7 +1,6 @@
 import numpy as np
-from sklearn.linear_model import LinearRegression
-
 import torch
+
 import torch.optim as optim
 import torch.nn as nn
 from torch.utils.data import Dataset, TensorDataset, DataLoader
@@ -25,7 +24,8 @@ def make_train_step_fn(model, loss_fn, optimizer):
          # Step 1 - Computes model's predictions - forward pass
          yhat = model(x)
          # Step 2 - Computes the loss
-         loss = loss_fn(yhat, y.reshape(y.shape[0],1))
+         # loss = loss_fn(yhat, y.reshape(y.shape[0],1))
+         loss = loss_fn(yhat, y)
          # Step 3 - Computes gradients for "b" and "w" parameters
          loss.backward()
          # Step 4 - Updates parameters using gradients and
@@ -46,7 +46,8 @@ def make_val_step_fn(model, loss_fn):
          # Step 1 - Computes model's predictions - forward pass
          yhat = model(x)
          # Step 2 - Computes the loss
-         loss = loss_fn(yhat, y.reshape(y.shape[0],1))
+         # loss = loss_fn(yhat, y.reshape(y.shape[0],1))
+         loss = loss_fn(yhat, y)
          # Do not calculate the gradients. Forward pass is all we need
          # Returns the loss
          return loss.item()
@@ -56,8 +57,8 @@ def make_val_step_fn(model, loss_fn):
 def mini_batch(device, data_loader, step_fn):
     mini_batch_losses = []
     for x_batch, y_batch in data_loader:
-        x_batch = x_batch.to(device)
-        y_batch = y_batch.to(device)
+        x_batch = x_batch.to(device, non_blocking=True)
+        y_batch = y_batch.to(device, non_blocking=True)
         mini_batch_loss = step_fn(x_batch, y_batch)
         mini_batch_losses.append(mini_batch_loss)
     loss = np.mean(mini_batch_losses)
@@ -139,7 +140,7 @@ x_tensor = torch.as_tensor(x_norm).float()
 y_tensor = torch.as_tensor(y).float()
 
 # Builds dataset containing ALL data points
-dataset = TensorDataset(x_tensor, y_tensor)
+dataset = TensorDataset(x_tensor, y_tensor.unsqueeze(1))
 
 # Performs the split
 ratio = .8
@@ -280,7 +281,7 @@ plt.show()
 train_loader = DataLoader(dataset=train_data, batch_size=n_train, shuffle=True)
 val_loader = DataLoader(dataset=val_data, batch_size=n_train)
 
-epochs_sweep = np.linspace(20,1000,50)
+epochs_sweep = np.linspace(20,1000,10)
 optim_sweep  = [optim.SGD, optim.Adam]
 results = np.empty((len(optim_sweep), len(epochs_sweep), 2))
 
@@ -320,7 +321,7 @@ ax2.plot(epochs_sweep, results[1][:,1], 'r--', label='Adam')
 plt.xlabel('Epoch')
 ax1.set_ylabel('MSE Loss', color='b')
 ax2.set_ylabel('Elapsed Time (sec)', color='r')
-plt.title('Final Loss and Runtime')
+plt.title('[CPU] Final Loss and Runtime')
 
 from matplotlib.lines import Line2D
 custom_lines = [
@@ -336,5 +337,67 @@ plt.show()
 
 # %%
 # ----------------------------------
-#          Part F
+#          Part G
 # ----------------------------------
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model=nn.Sequential(nn.Linear(num_features,1)).to(device)
+optimizer = optim.SGD(model.parameters(), lr=lr)
+loss_fn=nn.MSELoss(reduction='mean')
+train_step_fn = make_train_step_fn(model, loss_fn, optimizer)
+
+
+# train_loader = DataLoader(dataset=train_data, batch_size=n_train, shuffle=True, num_workers=4, pin_memory=True)
+train_loader = DataLoader(dataset=train_data, batch_size=n_train, shuffle=True )
+
+epochs_sweep = np.linspace(20,1000,10)
+optim_sweep  = [optim.SGD, optim.Adam]
+results = np.empty((len(optim_sweep), len(epochs_sweep), 2))
+
+import time
+
+lr = 0.05
+for optim_idx, opt in enumerate(optim_sweep):
+    for epoch_idx, n_epochs in enumerate(epochs_sweep):
+        
+        start_ts = time.time()
+        
+        model=nn.Sequential(nn.Linear(num_features,1)).to(device)
+        optimizer = opt(model.parameters(), lr=lr)
+        loss_fn=nn.MSELoss(reduction='mean') 
+        train_step_fn = make_train_step_fn(model, loss_fn, optimizer)
+        val_step_fn   = make_val_step_fn(model, loss_fn)
+
+        for epoch in range(int(n_epochs)):
+            loss = mini_batch(device, train_loader, train_step_fn)
+        
+        stop_ts = time.time()
+        
+        results[optim_idx][epoch_idx][0] = loss;
+        results[optim_idx][epoch_idx][1] = stop_ts-start_ts;
+        print(f"Finished [{opt.__name__:4}][{int(n_epochs):4}]: Loss={loss:6.3f} Time={results[optim_idx][epoch_idx][1]:9.5f}")
+        
+# %%
+fig, ax1 = plt.subplots(figsize=(8, 5))
+ax2 = ax1.twinx()
+
+ax1.plot(epochs_sweep, results[0][:,0], 'b', label='SGD')
+ax1.plot(epochs_sweep, results[1][:,0], 'b--', label='Adam')
+
+ax2.plot(epochs_sweep, results[0][:,1], 'r', label='SGD')
+ax2.plot(epochs_sweep, results[1][:,1], 'r--', label='Adam')
+
+plt.xlabel('Epoch')
+ax1.set_ylabel('MSE Loss', color='b')
+ax2.set_ylabel('Elapsed Time (sec)', color='r')
+plt.title('[GPU] Final Loss and Runtime')
+
+from matplotlib.lines import Line2D
+custom_lines = [
+    Line2D([0], [0], color='k', lw=2, linestyle='-'),
+    Line2D([0], [0], color='k', lw=2, linestyle='--')
+]
+
+# Add a single shared legend for both axes
+ax1.legend(custom_lines, ['SGD', 'Adam'], loc='upper center')
+
+plt.show()  
