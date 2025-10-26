@@ -1,0 +1,8 @@
+model = nn.Sequential()
+model.add_module('flatten', nn.Flatten())
+model.add_module('linear0', nn.Linear(400, 16, bias=True))
+model.add_module('ReLU0', nn.ReLU())
+model.add_module('linear1', nn.Linear(16, 4, bias=True))
+model.add_module('ReLU1', nn.ReLU())
+model.add_module('linear2', nn.Linear(4, 1, bias=True))
+model.add_module('sigmoid', nn.Sigmoid())

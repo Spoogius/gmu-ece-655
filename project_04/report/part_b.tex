@@ -1,0 +1,20 @@
+\newpage
+\section{Part B/C}
+\label{sec:sec_b}
+Next, before training the model since 20 data samples is insufficient the dataset was upsampled by a factor of 10 to now contain 200 images. Originally these 200 images were copies of the 20 hand drawn images from Part A. To augment the dataset random rotations and scaling were applied to these images. To create 200 unique images, albeit they are linear transforms applied to the original images. The dataset augmentation was acheived by the following code, and the 200 post augmented images can be see in Figures~\ref{fig:aug Q} and ~\ref{fig:aug M}.
+
+\LST{part\_b}
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/aug\_Q.png}
+	\caption{Q Augmented Dataset}
+	\label{fig:aug Q}
+\end{figure}
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/aug\_M.png}
+	\caption{M Augmented Dataset}
+	\label{fig:aug M}
+\end{figure}
