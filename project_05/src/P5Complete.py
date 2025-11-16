@@ -284,11 +284,9 @@ loader = DataLoader(dataset, batch_size=32, shuffle=True)
 model = nn.Sequential(
     nn.Conv2d(1, 1, kernel_size=5, padding=0),
     nn.ReLU(),
-    nn.MaxPool2d(2),
-    nn.Conv2d(1, 1, kernel_size=3, padding=0),
-    nn.ReLU(),
+    nn.MaxPool2d(4),
     nn.Flatten(),
-    nn.Linear(36, 4)
+    nn.Linear(16, 4)
 ).to(device);
 
 
@@ -400,6 +398,7 @@ plot_test_results(results[worst_idx]['model'], x_test, y_test, "Worse Model on V
 test_tensor = torch.empty((25,1,20,20));
 tt = ToTensor();
 grid_img = Image.open("../dataset/test_set.png");
+grid_img.show()
 # Select subimages and convert from PIL to tensor
 crop_bounds = np.array([2,2,22,22]);
 for col_idx in range(5):
