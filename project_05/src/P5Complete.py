@@ -131,7 +131,7 @@ def plot_loss_curve(result, title=None):
 
 def test_model( model, loader, x_test, y_test, epochs=20 ):
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.001)
+    optimizer = optim.Adam(model.parameters(), lr=0.003)
     train_loss = np.zeros((epochs,));
     test_loss  = np.zeros((epochs,));
     train_acc  = np.zeros((epochs,));
