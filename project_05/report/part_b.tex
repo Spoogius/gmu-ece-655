@@ -1,0 +1,38 @@
+\newpage
+\section{Part B/C}
+\label{sec:sec_b}
+Next, before training a model since 40 data samples is insufficient the dataset was upsampled by a factor of 10 to now contain 400 images. Originally these 400 images were copies of the 40 hand drawn images from Part A. To augment the dataset random rotations and scaling were applied to these images. To create 400 unique images, albeit they are linear transforms applied to the original images. The dataset augmentation was acheived by the following code, and the 400 post augmented images can be see in Figures~\ref{fig:aug Q}-~\ref{fig:aug O}.
+
+\LST{part\_b}
+\newpage
+\begin{figure}[h]
+	\centering
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/aug\_Q.png}
+		\caption{Augmented Q Dataset}
+		\label{fig:aug Q}
+	\end{minipage}\hfill
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=\textwidth]{figures/aug\_M.png}
+		\caption{Augmented M Dataset}
+		\label{fig:aug M}
+	\end{minipage}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=\columnwidth]{figures/aug\_X.png}
+		\caption{Augmented X Dataset}
+		\label{fig:aug X}
+	\end{minipage}\hfill
+	\begin{minipage}{0.48\textwidth}
+		\centering
+		\includegraphics[width=\columnwidth]{figures/aug\_O.png}
+		\caption{Augmented Other Dataset}
+		\label{fig:aug O}
+	\end{minipage}
+\end{figure}

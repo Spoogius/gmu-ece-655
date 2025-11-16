@@ -1,0 +1,133 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amssymb} %\mathbb
+\usepackage{amsmath} % {align}
+\usepackage{xcolor}
+\usepackage{verbatim}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,      
+	urlcolor=cyan,
+	pdftitle={ECE655\_Project\_5},
+	pdfpagemode=FullScreen,
+}
+\usepackage{subcaption}
+\usepackage{wrapfig}
+%\usepackage[most]{tcolorbox}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{mdframed}
+\usepackage{makecell}
+\usepackage{array}
+\usepackage{pbox}
+\usepackage{textcomp}
+\usepackage{upgreek}
+\usepackage{gensymb}
+\usepackage{longtable}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{booktabs} % To thicken table lines
+\usepackage{hyphenat}
+\usepackage{url}
+\usepackage{hyperref}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+\definecolor{filename}{rgb}{0.1,0.1,0.99}
+\definecolor{textout}{rgb}{0.3,0.4,0.3}
+
+\newcommand{\purple}[1]{\textsf{\textcolor{codepurple}{#1}}}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\ttfamily\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=mystyle}
+
+%\renewcommand{\texttt}[1]{%
+	%  \begingroup
+	%   \ttfamily
+	%   \begingroup\lccode`~=`/\lowercase{\endgroup\def~}{/\discretionary{}{}{}}%
+	%   \begingroup\lccode`~=`[\lowercase{\endgroup\def~}{[\discretionary{}{}{}}%
+	%   \begingroup\lccode`~=`.\lowercase{\endgroup\def~}{.\discretionary{}{}{}}%
+	%   \catcode`/=\active\catcode`[=\active\catcode`.=\active
+	%   \scantokens{#1\noexpand}%
+	%   \endgroup
+	% }
+
+% Define todo                                                                   
+\newcommand{\TODO}[1]{\textcolor{red}{[TODO: #1]}}
+\newcommand{\ans}[1]{\textcolor{blue}{\textbf{#1}}}
+
+\newcommand{\FILE}[1]{\textsf{\textcolor{filename}{#1.py}}}
+\newcommand{\FILe}[1]{\textsf{\textcolor{filename}{#1}}}
+\newcommand{\lst}[1]{ \vspace{10pt}\lstinputlisting[language=Python]}
+\newcommand{\LST}[1]{ \vspace{10pt}\lstinputlisting[language=Python,caption=\textsf{\textcolor{filename}{#1.py}}]{code/#1.py}}
+\newcommand{\ou}[1]{\begin{itemize}\item[]\textsf{\small\textcolor{textout}{#1}}\end{itemize}}
+\newcommand{\OU}[1]{ \vspace{-8pt}\noindent\rule{\textwidth}{1pt}\vspace{-12pt}\begin{itemize}\item[]\textsf{\footnotesize\textcolor{textout}{#1}}\end{itemize}\vspace{-16pt}\rule{\textwidth}{1pt}}
+\newcommand{\out}[1]{ \noindent\rule{\textwidth}{1pt}\vspace{-24pt}\begin{itemize}\item[]\textsf{\textcolor{textout}{#1}}\end{itemize}\vspace{-28pt}\rule{\textwidth}{1pt}}
+\newcommand{\Out}[1]{ \noindent\rule{\textwidth}{1pt}\vspace{-24pt}\begin{itemize}\item[]\textsf{\textcolor{textout}{#1}}\end{itemize}\vspace{-18pt}\rule{\textwidth}{1pt}}
+\newcommand{\OUt}[1]{ \noindent\rule{\textwidth}{1pt}\vspace{-12pt}\begin{itemize}\item[]\textsf{\textcolor{textout}{#1}}\end{itemize}\vspace{-18pt}\rule{\textwidth}{1pt}}
+\newcommand{\OUT}[1]{ \noindent\rule{\textwidth}{1pt}\vspace{-10pt}\begin{itemize}\item[]\textsf{\textcolor{textout}{#1}}\end{itemize}\vspace{-10pt}\rule{\textwidth}{1pt}}
+%\newcommand{\OUT}[1]{ \rule{\textwidth}{1pt}\vspace{2pt}\textsf{\textcolor{textout}{#1}}\rule{\textwidth}{1pt}}
+\newcommand{\CMD}[1]{\textsf{\textcolor{magenta}{#1}()}}
+\newcommand{\CMd}[1]{\textsf{\textcolor{magenta}{#1}}}
+\newcommand{\cmd}[1]{\textsf{\small\textcolor{magenta}{#1}()}}
+\newcommand{\VAR}[1]{\textsf{\textbf{#1}}}
+\newcommand{\TYPE}[1]{\textbf{\emph{#1}}}
+\newcommand{\VSEP}{\vspace{4pt}\noindent}
+\newcommand{\HSEP}{\hspace{10pt}}
+\newcommand{\PY}[1]{\lstinline[language=Python]{#1}}
+\newcommand{\PYout}[1]{\textsf{\textcolor{textout}{#1}}}
+\newcommand{\SP}{\textvisiblespace}
+\newcommand{\SPP}{\textvisiblespace\textvisiblespace}
+\newcommand{\SPPP}{\textvisiblespace\textvisiblespace\textvisiblespace}
+\newcommand{\SPPPP}{\textvisiblespace\textvisiblespace\textvisiblespace\textvisiblespace}
+\newcommand{\ERROR}[1]{\textcolor{red}{\small #1}}
+\newcommand{\Error}[1]{\textcolor{red}{\footnotesize #1}}
+
+\newcommand{\specialcell}[2][c]{%
+	\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+
+\begin{document}
+	\title{ECE655 Project 05\\
+		\vspace{4pt}
+		\small{Author: Stewart Schuler}
+		\vspace{-12pt}}
+	\date{}
+	\maketitle
+	\begin{center}
+		\textbf{Due: 11/16/2025}
+	\end{center}
+	
+	\tableofcontents
+	\input{part_a}
+	\input{part_b}
+	\input{part_e}
+
+	
+\end{document}
+

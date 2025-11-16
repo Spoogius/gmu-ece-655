@@ -1,0 +1,20 @@
+\newpage
+\section{Part E}
+\label{sec:sec_e}
+Next, in order to train a model the augmented dataset an 80:20 split was applied to the data.
+
+\LST{part\_d1}
+
+The goal of this exercise was to find a \textit{cheap} model capable of achieving at least a $70\%$ validation accuracy. After some experimentation the model able to achieve the stated goal was a single convolution layer with a 5x5 kernel, a max pool layer which decreases the kernel output by a factor of 16, and a linear output layer with 4 neurons for each class. In total the model used only 94 parameters to achieve a best validation accuracy of $0.725\%$.
+
+\LST{part\_d2}
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/cheap_loss.png}
+	\caption{Cheap Model Loss and Accuracy}
+	\label{fig:cheap loss}
+\end{figure}
+
+
+
