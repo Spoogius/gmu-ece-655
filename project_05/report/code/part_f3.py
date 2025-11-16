@@ -1,0 +1,12 @@
+Sequential(  
+	(conv0): Conv2d(1, 12, kernel_size=(5, 5), stride=(1, 1))
+	(ReLU0): ReLU()
+	(maxp0): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+	(conv1): Conv2d(12, 12, kernel_size=(5, 5), stride=(1, 1))
+	(ReLU1): ReLU()
+	(maxp1): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+	(flatten): Flatten(start_dim=1, end_dim=-1)
+	(h0): Linear(in_features=48, out_features=256, bias=True)
+	(hReLU0): ReLU()
+	(output): Linear(in_features=256, out_features=4, bias=True)
+)

@@ -1,0 +1,49 @@
+\newpage
+\section{Part X}
+\label{sec:sec_x}
+
+Finally, we consider how the models perform on a distinctly generated test set. Per the assignment instructions the test set was generated as a single .PNG image as shown in Figure~\ref{fig:test set}. The easy other images are newly drawn versions of the letters found in the other training set. For the tricky letters a chose a set of greek letters that slightly resemble those the classes Q, M, and X. The explanation for each tricky character is as follows;\\
+\\
+$\alpha$: has a round portion like Q while also having a cross like portion of the X.\\
+$\Omega$: a lot like a Q but isn't fully closed.\\
+$\lambda$: a lot like an X but is missing an arm.\\
+$\Theta$: is a Q with the tail shifted to the center of the circle.\\
+$\upbeta$: has the same arches as a sideways M while also having a Q like tail.\\
+\\
+Using the following code each individual image was extracted using the \textit{PIL} API. And the individually extracted images are shown in the format used previously in Figure~\ref{fig:test set extracted}.
+
+\LST{part\_x}
+
+\begin{figure}[h]
+\centering
+\begin{minipage}{0.48\textwidth}
+	\centering
+	\includegraphics[width=\columnwidth]{figures/test\_set.png}
+	\caption{Test Set Image}
+	\label{fig:test set}
+\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}
+	\centering
+	\includegraphics[width=\columnwidth]{figures/test\_extracted.png}
+	\caption{Test Set Extracted}
+	\label{fig:test set extracted}
+\end{minipage}
+\end{figure}
+
+We test this new dataset on our best performing model (21) and produced the predictions shown in Figure~\ref{fig:best test}. As can be seen, the model correctly predicts all Q, M, and X test cases, and got 4/5 of the \textit{easy} other classes, struggling to identify the A case. 19/20 of the expected models is about in line what we should expect for performance given the previously reported $96.25\%$ validation accuracy. This model however failed all \textit{tricky} cases in a predictable manor given it predicted what we were attempting to trick it with, excepting the $\upbeta$ which it predicted X for. 
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/best_test.png}
+	\caption{Best Model on Test Set}
+	\label{fig:best test}
+\end{figure}
+
+We repeat the same test with our worse performing model (28) and produces the predictions shown in Figure~\ref{fig:worst test}. It can be seen that the model completely failed on the Other class. This leads me to conclude that the model completely ignored learning the other class, likely due to the diversity of characters and instead focused on learning filters geared towards identifying the three consistent classes. Also this model architecture only had 4 convolution filters, which means at most it is identifying one features per class. 
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/worst_test.png}
+	\caption{Worst Model on Test Set}
+	\label{fig:worst test}
+\end{figure}
