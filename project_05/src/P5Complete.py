@@ -115,18 +115,21 @@ def plot_test_results( model, x_test, y_test, title=None ):
 def plot_loss_curve(result, title=None):
     fig, axes = plt.subplots( 2, 1 );
     epochs = np.arange(len(result["train_loss"]))+1;
-    axes[0].plot(epochs, result["train_loss"], color="blue", label="Training Loss");
-    axes[0].plot(epochs, result["test_loss"], color='red', label='Validation Loss')
+    axes[0].plot(epochs, result["train_loss"], color="blue", label="Training");
+    axes[0].plot(epochs, result["test_loss"], color='red', label='Validation')
     axes[0].set_ylabel('CE Loss')
+    axes[0].set_title("Loss");
     axes[0].set_xticks([]);
-    
-    axes[1].plot(epochs, result["train_acc"], color="blue", label="Training Accuracy");
-    axes[1].plot(epochs, result["test_acc"], color='red', label='Validation Accuracy')
+    axes[0].legend()
+    axes[1].plot(epochs, result["train_acc"], color="blue", label="Training");
+    axes[1].plot(epochs, result["test_acc"], color='red', label='Validation')
     axes[1].set_ylabel('Accuracy')
     axes[1].set_xlabel('Epochs');
     axes[1].set_title("Accuracy");
+    
     if title:
         plt.suptitle(title)
+    
     plt.show();
 
 def test_model( model, loader, x_test, y_test, epochs=20 ):
@@ -290,7 +293,7 @@ model = nn.Sequential(
 ).to(device);
 
 
-# %% Train model
+
 result = test_model( model, loader, x_test, y_test, epochs=50 );
 
 plot_loss_curve(result, title=f"Cheap Model: {result['P']} Parameters Best Acc: {np.max(result['test_acc'])}")
@@ -430,5 +433,8 @@ plot_test_results(results[best_idx]['model'], norm_test_tensor, test_labels, "Be
 norm_test_tensor = normalizer(test_tensor);
 plot_test_results(results[worst_idx]['model'], norm_test_tensor, test_labels, "Worst Model on Test Set")
 
-        
-
+# %% Write Results table for latex
+with open("latex_table.txt", "w") as fout:
+    for ii in range(len(results)):
+        fout.write(f"{ii} & {results[ii]['minBC']:.5f} & {results[ii]['E95']} & {results[ii]['E90']} & {results[ii]['E80']} & {results[ii]['E70']} & {results[ii]['P']} & {results[ii]['T']:.6f} & {results[ii]['cost']:.6f} \\\ \hline\n")
+    fout.close();
