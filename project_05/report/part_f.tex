@@ -1,0 +1,36 @@
+\newpage
+\section{Part F}
+\label{sec:sec_f}
+
+Next, we consider a range of different models. For this section 60 models were chosen. The models are defined by randomly selecting 60 unique permutations of the following parameter sets.
+
+\LST{part\_f1}
+
+The models are then constructed based on those 5 parameters using the following \textit{create\_model} function.
+
+\LST{part\_f2}
+
+The same 80:20 data split from the previous section was then used to train and validate all 60 models. The results of which are shown in the table in Section \ref{app:app_a}. All the models that were able to reach high accuracy (i.e. E95 is not \textit{None}), had at least 6 convolution kernels, with most of them having 10 or 12. Conversely none of the models with 2 or 4 kernels were able to achieve a $95\%$ validation accuracy, which make sense if we assume with 4+ kernels, the kernels are learning features to identify a specific class. As for the cost the parameters that seemed to have the largest impact were the number of hidden layers and the number of neurons per hidden layer. Which in turn ballooned the number of parameters in the total model. Because the convolution kernels were fairly small in size, increasing the the number of kernels didn't have that large an impact on number of parameters.
+
+The best performing model was model 21. Which had the following loss and accuracy curves, and it produced a validation test accuracy of $96.25\%$, shown by Figure~\ref{fig:best val}. And it can be seen that one of the validation set data points it got incorrect, was heavily effected by the augmentation making it a very difficult image to classify. Also interesting the best performing model used $17496$ parameters, while significant more than the cheap model, it was substantially less than some of the other worse performing models.
+
+The model architecture of the best performing model is as follows,
+
+\LST{part\_f3}
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/best_loss.png}
+	\caption{Best Model Loss and Accuracy}
+	\label{fig:best loss}
+\end{figure}
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=\columnwidth]{figures/best_val.png}
+	\caption{Best Model Validation Results}
+	\label{fig:best val}
+\end{figure}
+
+
+
