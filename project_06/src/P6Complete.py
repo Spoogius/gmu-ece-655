@@ -250,9 +250,7 @@ def PreprocessedDataset(model_idt, loader, device=None):
 ## Preprocess the dataset
 model = deepcopy(model_base); #Identify final layer
 
-#filename ="CIFAR100preproc_class"
 filename ="CIFAR100preproc"
-#filename ="CIFAR100preproc_gpt"
 start_time = time.time();
 pp_dataset_train = PreprocessedDataset(model, train_loader, device );
 print(f"[{time.time()-start_time:.1f}] Finished Preprocesses Training Dataset");

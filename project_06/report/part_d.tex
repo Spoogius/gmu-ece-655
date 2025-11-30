@@ -1,0 +1,37 @@
+\newpage
+\section{Part D}
+\label{sec:sec_d}
+Next, the two fine and coarse classifiers were combined into a single class called \textit{BrainNet}. Which when given an inputs returns both the fine and coarse classification while sharing a common feature extractor to prevent redundant computations.  
+
+\LST{part\_d}
+
+In order to test out the \textit{BrainNet} model a non-\textit{CIFAR-100} dataset was chosen. The test data comes from the \textit{Tiny-ImageNet} dataset downloaded from \textit{Hugging Face}\footnote{https://huggingface.co/datasets/zh-plus/tiny-imagenet}. This dataset contained 100,000 64x64 images spread across 200 class labels. The images were resized and normalized to match the \textit{CIFAR-100} images used in training. Because this data is coming from a different dataset with different labels it wouldn't be expected the the \textit{BrainNet} model would get equal performance to the test set used in the previous sections. Additionally a large number of the \textit{Tiny-ImageNet} don't have a direct analogous \textit{CIFAR-100} label. To address this problem 11 classes were chosen from the \textit{Tiny-ImageNet} labels that either directly overlapped with \textit{CIFAR-100} labels or I determined were similar enough that the model should be able to classify them. The mapping of the chosen 11 classes is as follows, for the coarse labels they were chosen to be the corresponding coarse label to the associated fine label. 
+
+\LST{part\_d\_2}
+
+Using the chosen labels as a subset of the \textit{Tiny-ImageNet} dataset, there were 5440 new images that could be tested. After running them through the \textit{BrainNet} model (which was training on \textit{CIFAR-100} data), the model produced the accuracies shown in Table~\ref{table:bn acc}. As can be seen the model did quite well at classifying these new images. 
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{|c|c|c|}
+		\toprule
+		\textbf{BrainNet} & \textbf{Top-1} & \textbf{Top-5} \\
+		\midrule
+		Fine & 0.62 & 0.77 \\ \hline
+		Coarse & 0.67 & 0.84 \\ \hline
+	\end{tabular}
+	\caption{\textit{BrainNet} Accuracies}
+	\label{table:bn acc}
+\end{table}
+
+%For further result Figure~\ref{fig:coarse cm}
+
+\begin{figure}[h]
+	
+	\centering
+	\includegraphics[width=\textwidth]{figures/coarse\_cm.png}
+	\caption{Coarse Accuracies}
+	\label{fig:coarse cm}
+	
+\end{figure}
+

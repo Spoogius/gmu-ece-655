@@ -1,0 +1,17 @@
+\newpage
+\section{Part B}
+\label{sec:sec_b}
+In order to avoid the long training time discussed in the previous section, the dataset can be preprocessed by passing it through the frozen feature extractor of the model and saving the outputs. Then in order to train the final layer, it can be treated as a separate model with a input of 1536 features. Preventing the training set from needing to be unnecessarily recomputed.  
+
+\LST{part\_b}
+
+With the training set preprocessed the new classifier was training for 30 epochs. The top-1 and top-5 accuracies are report in Figure~\ref{fig:fine acc}. As can be seen the model converged after only a few epochs, but because of the inclusion of a dropout layer the continued training didn't hurt the test set accuracy. After 30 epochs the classifier layer had a top-5 test accuracy of 0.95 and a top-1 accuracy of 0.78. Because of the dataset preprocessing the average training time per epoch for this model was 0.89 seconds. A significant reduction compared to recomputing the frozen features. 
+
+\begin{figure}[h]
+
+	\centering
+	\includegraphics[width=\textwidth]{figures/fine\_acc.png}
+	\caption{Fine Accuracies}
+	\label{fig:fine acc}
+
+\end{figure}

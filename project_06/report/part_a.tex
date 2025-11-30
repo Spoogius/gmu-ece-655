@@ -1,0 +1,10 @@
+\newpage
+\section{Part A}
+\label{sec:sec_a}
+In the \textit{EfficientNet-B3} model the vast majority of the model and parameters make up the feature extractor. In order to apply transfer learning to the model all the weights were frozen and the the final layer, called \textit{classifier} was removed. To make the model work with the \textit{CIFAR-100} dataset, the final layer way repalced with a linear layer with 1536 inputs and 100 outputs representing the fine class labels in the dataset.\
+
+\LST{part\_a}
+
+Using the new model, the final layer was retrained for 3 epochs, and was found to have a top-1 accuracy value of 0.5441. For this experiment the training data was passed through the entire model on each epoch, even though since the weights in the feature extractor are frozen the 1536 features going to the final layer will be the same. Because of that, the average training time per epoch was 195 seconds.
+
+
