@@ -33,7 +33,7 @@ def top_5(label, y_pred):
 
 def test_model( model, train_loader, test_loader, optimizer=None,  device=None, epochs=20 ):
     total_time_start = time.time();
-    loss_fn = nn.CrossEntropyLoss()
+    loss_fn = nn.CrossEntropyLoss(reduction='mean')
     if( optimizer == None ):
         optimizer = optim.Adam(model.parameters(), lr=0.001)
     train_loss = np.zeros((epochs,));
@@ -43,6 +43,7 @@ def test_model( model, train_loader, test_loader, optimizer=None,  device=None, 
     train_acc5 = np.zeros((epochs,));
     test_acc5  = np.zeros((epochs,));
     train_time = np.zeros((epochs,));
+    test_time  = np.zeros((epochs,));
     
     N_training = 50000;
     N_testing  = 10000;
@@ -74,16 +75,19 @@ def test_model( model, train_loader, test_loader, optimizer=None,  device=None, 
         total_loss = 0.0
         total_correct1 = 0
         total_correct5 = 0
+        start_time = time.time();
         with torch.no_grad():
             for batch_x, batch_y in test_loader:
                 y_pred = model(batch_x.to(device))
-                #loss = loss_fn(y_pred, batch_y.to(device))
-                #total_loss += loss.item()* batch_x.size(0);
+                loss = loss_fn(y_pred, batch_y.to(device))
+                total_loss += loss.item()* batch_x.size(0);
                 total_correct1 += np.sum(top_1(batch_y.cpu().numpy(), y_pred.detach().cpu().numpy()));
                 total_correct5 += np.sum(top_5(batch_y.cpu().numpy(), y_pred.detach().cpu().numpy()));
             test_loss[epoch] = total_loss/N_testing;
             test_acc1[epoch] = total_correct1/N_testing;
             test_acc5[epoch] = total_correct5/N_testing;
+        stop_time = time.time();
+        test_time[epoch] = stop_time - start_time;
         total_time_stop = time.time();
         print(f"[{total_time_stop-total_time_start:5.2f}] {epoch:2d}/{epochs}: Loss: {train_loss[epoch]:.4f} T1 Acc (Tr): {train_acc1[epoch]:.4f} T5 Acc (Tr): {train_acc5[epoch]:.4f} T1 Acc (Te): {test_acc1[epoch]:.4f} T5 Acc (Te) {test_acc5[epoch]:.4f}")
         
@@ -104,34 +108,35 @@ def test_model( model, train_loader, test_loader, optimizer=None,  device=None, 
     rtn["P"] = sum(p.numel() for p in model.parameters());
     # Evalutaion time
     rtn["train_time"] = train_time;
-    start_time = time.time();
-    for ii in range(10):
-       model.eval()
-       with torch.no_grad():
-           for batch_x, batch_y in test_loader:
-               y_pred = model(batch_x.to(device))
-    stop_time = time.time();
-    rtn["eval_time"] = (stop_time - start_time)/10;
+    rtn["eval_time"] = test_time;
 
     return rtn;
 
 def plot_accuracy(results):
     N_EPOCHS = int(len(results['test_acc1']))
-    plt_epoch = np.linspace(1,N_EPOCHS, N_EPOCHS);
-    fig, axes = plt.subplots(2, 1)
-    axes[0].plot( plt_epoch, results['train_acc5'], color="blue", label='Training');
-    axes[0].plot( plt_epoch, results['test_acc5' ], color="red", label='Validation');
-    axes[0].set_ylabel('T5 Accuracy')
-    axes[0].set_xticks([]);
-    axes[0].legend()
     
-    axes[1].plot(plt_epoch, results["train_acc1"], color="blue", label="Training");
-    axes[1].plot(plt_epoch, results["test_acc1" ], color='red', label='Validation')
-    axes[1].set_ylabel('T1 Accuracy')
-    axes[1].set_xlabel('Epochs');
-
-    axes[0].set_title("Accuracy");
+    plt_epoch = np.linspace(1,N_EPOCHS, N_EPOCHS);
+    plt.plot(plt_epoch, results['train_acc1'], color="blue", label='Train (Top 1)');
+    plt.plot(plt_epoch, results[ 'test_acc1'], color="red", label='Test (Top 1)');
+    plt.plot(plt_epoch, results[ 'test_acc5'], color="green", label='Test (Top 5)');
+    plt.legend();
+    plt.xlabel("Epochs");
+    plt.ylabel("Accuracy");
     plt.show();
+    # fig, axes = plt.subplots(2, 1)
+    # axes[0].plot( plt_epoch, results['train_acc5'], color="blue", label='Training');
+    # axes[0].plot( plt_epoch, results['test_acc5' ], color="red", label='Validation');
+    # axes[0].set_ylabel('T5 Accuracy')
+    # axes[0].set_xticks([]);
+    # axes[0].legend()
+    
+    # axes[1].plot(plt_epoch, results["train_acc1"], color="blue", label="Training");
+    # axes[1].plot(plt_epoch, results["test_acc1" ], color='red', label='Validation')
+    # axes[1].set_ylabel('T1 Accuracy')
+    # axes[1].set_xlabel('Epochs');
+
+    # axes[0].set_title("Accuracy");
+    # plt.show();
 
 device = "cuda";
 # %% 
@@ -222,16 +227,16 @@ test_loader  = DataLoader(  test_dataset, batch_size=32, shuffle=False );
 # Add new output layer to model
 model.classifier = nn.Sequential(nn.Dropout(.5), nn.Linear(1536, 100, bias=True));
 model.to(device);
-# %%
-N_EPOCHS = 10;
+
+N_EPOCHS = 3;
 results_A = test_model( model, train_loader, test_loader, device=device, epochs=N_EPOCHS );
 plot_accuracy(results_A);
 # %% Part B
-def PreprocessedDataset(model, loader, device=None):
+def PreprocessedDataset(model_idt, loader, device=None):
     model.to(device)
     for i, (x, y) in enumerate(loader):
-        model.eval()
-        output = model(x.to(device))
+        model_idt.eval()
+        output = model_idt(x.to(device))
         if i == 0:
             features = output.detach().cpu()
             labels = y.cpu()
@@ -266,10 +271,10 @@ pp_loader_train = DataLoader( pp_dataset_train, batch_size=64, shuffle=True );
 pp_loader_test  = DataLoader( pp_dataset_test,  batch_size=64, shuffle=False);
 
 # %% Train final model classifier layers
-model_classifier = nn.Sequential(nn.Dropout(0.5), nn.Linear(1536, 100, bias=True));
-model_classifier.to(device);
+model_classifier_fine = nn.Sequential(nn.Dropout(0.5), nn.Linear(1536, 100, bias=True));
+model_classifier_fine.to(device);
 N_EPOCHS = 30;
-results_B = test_model( model_classifier, pp_loader_train, pp_loader_test, optimizer=optim.Adam(model_classifier.parameters(), lr=0.001), device=device, epochs=N_EPOCHS );
+results_B = test_model( model_classifier_fine, pp_loader_train, pp_loader_test, optimizer=optim.Adam(model_classifier_fine.parameters(), lr=3E-4), device=device, epochs=N_EPOCHS );
 plot_accuracy(results_B);
 # %% Get coarse labels
 import os
@@ -305,13 +310,14 @@ pp_loader_coarse_train = DataLoader( pp_dataset_coarse_train, batch_size=32, shu
 pp_loader_coarse_test  = DataLoader(  pp_dataset_coarse_test, batch_size=32, shuffle=False );
 
 # %% Train final model classifier layers on coarse labels
-model_classifier = nn.Sequential(nn.Dropout(.5), nn.Linear(1536, 20, bias=True));
-model_classifier.to(device);
+model_classifier_coarse = nn.Sequential(nn.Dropout(.5), nn.Linear(1536, 20, bias=True));
+model_classifier_coarse.to(device);
 N_EPOCHS = 30;
-results_C = test_model( model_classifier, pp_loader_coarse_train, pp_loader_coarse_test, optimizer=optim.Adam(model_classifier.parameters(), lr=0.001), device=device, epochs=N_EPOCHS );
+results_C = test_model( model_classifier_coarse, pp_loader_coarse_train, pp_loader_coarse_test, optimizer=optim.Adam(model_classifier_coarse.parameters(), lr=0.001), device=device, epochs=N_EPOCHS );
 plot_accuracy(results_C);
 # %%
 import json
+# https://huggingface.co/datasets/zh-plus/tiny-imagenet/blob/main/classes.py
 with open("dataset/tiny-imagenet-classes.json", "r") as f:
     tinyin_classes = json.load(f)
 
@@ -341,7 +347,7 @@ common_classes = {
     "177": {"cfar_fine": 61 }, # Plate -> Plate
     "8":   {"cfar_fine": 79 }, # Black Widow -> Spider
     "9":   {"cfar_fine": 79 }, # Tarantual -> Spider
-    "77":  {"cfar_fine": 77 }, # Snail -> Snail
+    "77":  {"cfar_fine": 15 }, # Snail -> Snail
     "18":  {"cfar_fine": 45 }, # Lobster -> Lobster
     "34":  {"cfar_fine": 43 }, # Lion -> Lion
     "92":  {"cfar_fine": 39 }, # Computer Keyboard -> Keytboard
@@ -361,10 +367,152 @@ for class_key in classes_key:
         class_key['cfar_coarse'] = None
         class_key['cfar_coarse_str'] = None
 
+
+full_dataset_idx = np.array([]);
 for class_key in classes_key:
     if class_key['cfar_fine'] is None:
         pass;
     else:
+        full_dataset_idx = np.append(full_dataset_idx, np.where(np.array(full_dataset.targets) == class_key['tinyin_label'] )[0])
         print(class_key)
+
+tin_data = torch.empty(len(full_dataset_idx),3,300,300, dtype=torch.float32)
+tin_label_tin    = torch.empty(len(full_dataset_idx), dtype=torch.int64)
+tin_label_fine   = torch.empty(len(full_dataset_idx), dtype=torch.int64)
+tin_label_coarse = torch.empty(len(full_dataset_idx), dtype=torch.int64)
+for ii, fd_idx in enumerate(full_dataset_idx):
+    tin_data[ii]      = full_dataset[int(fd_idx)][0];
+    tin_label_tin[ii] = full_dataset[int(fd_idx)][1];
+    tin_label_fine[ii]   = classes_key[tin_label_tin[ii]]['cfar_fine'];
+    tin_label_coarse[ii] = classes_key[tin_label_tin[ii]]['cfar_coarse'];
+    
+# %%
+class BrainNet:
+    def __init__(self, model_common, model_coarse, model_fine, device='cpu'):
+        self.model_common_ = model_common;
+        self.model_coarse_ = model_coarse;
+        self.model_fine_   = model_fine;
+        self.model_common_.to(device);
+        self.model_coarse_.to(device);
+        self.model_fine_.to(  device);
+        self.model_common_.eval();
+        self.model_coarse_.eval();
+        self.model_fine_.eval();
         
+    def __call__(self, x ):
+        common_output = self.model_common_(x.to(device))
+        y_pred_fine   = model_classifier_fine(   common_output );
+        y_pred_coarse = model_classifier_coarse( common_output );
+        return y_pred_coarse, y_pred_fine
+# %%
+
+model_bn = BrainNet( model_base, model_classifier_coarse, model_classifier_fine, device=device)
+BS = 64;
+start_idx = 0;
+total_correct1_coarse = 0;
+total_correct5_coarse = 0;
+total_correct1_fine = 0;
+total_correct5_fine = 0;
+total_preds = 0;
+pred_coarse = np.empty(len(full_dataset_idx), dtype=np.int64 )
+pred_fine   = np.empty(len(full_dataset_idx), dtype=np.int64 )
+for ii in range(int(tin_data.size()[0]/BS)):
+    y_pred_coarse, y_pred_fine  = model_bn(tin_data[start_idx:start_idx+BS:]);
+    
+    # common_output = model_base(tin_data[start_idx:start_idx+BS:].to(device))
+    
+    # y_pred_fine   = model_classifier_fine(   common_output );
+    pred_fine[start_idx:start_idx+BS:] = np.argmax(y_pred_fine.detach().cpu().numpy(),axis=1);
+    total_correct5_fine += np.sum(top_5(tin_label_fine[start_idx:start_idx+BS:].cpu().numpy(), y_pred_fine.detach().cpu().numpy()))
+    total_correct1_fine += np.sum(top_1(tin_label_fine[start_idx:start_idx+BS:].cpu().numpy(), y_pred_fine.detach().cpu().numpy()))
+    
+    # y_pred_coarse = model_classifier_coarse( common_output );
+    pred_coarse[start_idx:start_idx+BS:] = np.argmax(y_pred_coarse.detach().cpu().numpy(),axis=1);
+    total_correct5_coarse += np.sum(top_5(tin_label_coarse[start_idx:start_idx+BS:].cpu().numpy(), y_pred_coarse.detach().cpu().numpy()))
+    total_correct1_coarse += np.sum(top_1(tin_label_coarse[start_idx:start_idx+BS:].cpu().numpy(), y_pred_coarse.detach().cpu().numpy()))
+    
+    total_preds += BS;
+    
+    start_idx += BS;
+    
+    
+print(f"Fine:   T1 Acc: {total_correct1_fine  /total_preds:.2f} - T5 Acc: {total_correct5_fine  /total_preds:.2f}")
+print(f"Coarse: T1 Acc: {total_correct1_coarse/total_preds:.2f} - T5 Acc: {total_correct5_coarse/total_preds:.2f}")
+    
+# %%
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import ConfusionMatrixDisplay
+
+
+true_labels = [None,
+ None,
+ None,
+ 'plate',
+ 'orange',
+ 'computer keyboard',
+ None,
+ None,
+ 'lion',
+ None,
+ None,
+ 'bow tie',
+ None,
+ 'lobster',
+ None,
+ None,
+ None,
+ None,
+ None,
+ 'lawn mower']; # Manual clean up names b/c messy
+pred_labels = cifar_coarse_label_strs;
+# for ck in classes_key:
+#     if(ck['cfar_coarse'] is None):
+#         continue;
+#     else:
+#         true_labels[ck['cfar_coarse']] = ck['tinyin'];
+#         #pred_labels[ck['cfar_coarse']] = ck['tinyin'];
+     
+        
+cm_coarse = confusion_matrix(tin_label_coarse[0:total_preds:], pred_coarse[0:total_preds:])
+fig, ax = plt.subplots(figsize=(10, 10), dpi=200)   # ← Your size NOW works   
+plt.rcParams.update({'font.size': 10})
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_coarse)
+disp.plot(cmap="Blues", xticks_rotation=90, ax=ax, colorbar=False)  # ← Use your axis
+ax.set_xticklabels(labels=pred_labels, rotation=90, fontsize=12);
+ax.set_yticklabels(labels=true_labels, fontsize=15);
+plt.title("Coarse Labels");
+plt.tight_layout()
+plt.show()
+
+cm_fine = confusion_matrix(tin_label_fine[0:total_preds:], pred_fine[0:total_preds:])
+fig, ax = plt.subplots(figsize=(20, 20), dpi=200)   # ← Your size NOW works   
+plt.rcParams.update({'font.size': 9})
+disp = ConfusionMatrixDisplay(confusion_matrix=cm_fine)
+disp.plot(cmap="Blues", xticks_rotation=90, ax=ax, colorbar=False)  # ← Use your axis
+plt.title("Fine Labels");
+plt.tight_layout()
+plt.show()
+
+# %% 100 Random Labels
+test_idx = np.random.permutation(tin_data.size()[0])[0:100:];
+y_pred_coarse, y_pred_fine  = model_bn(tin_data[test_idx]);
+    
+# %%
+# y_pred_fine   = model_classifier_fine(   common_output );
+pred_fine = np.argmax(y_pred_fine.detach().cpu().numpy(),axis=1);
+total_correct1_fine = np.sum(top_1(tin_label_fine[test_idx].cpu().numpy(), y_pred_fine.detach().cpu().numpy()))
+
+# y_pred_coarse = model_classifier_coarse( common_output );
+pred_coarse = np.argmax(y_pred_coarse.detach().cpu().numpy(),axis=1);
+total_correct1_coarse = np.sum(top_1(tin_label_coarse[test_idx].cpu().numpy(), y_pred_coarse.detach().cpu().numpy()))
+    
+total_preds = 100;
+
+pred_perc_coarse = 100/(1+np.exp(-1*np.max(y_pred_coarse.detach().cpu().numpy(),axis=1)))
+pred_perc_fine   = 100/(1+np.exp(-1*np.max(y_pred_fine.detach().cpu().numpy(),axis=1)))
+
+for ii in range(total_preds):
+    print(f"{ii:2d}, {classes_key[tin_label_tin[test_idx[ii]]]['tinyin'].replace(',', '')}, {classes_key[tin_label_tin[test_idx[ii]]]['cfar_coarse_str'].replace(',', '')}, {pred_perc_coarse[ii]:.2f}, {int(tin_label_coarse[test_idx[ii]] == pred_coarse[ii])}, {classes_key[tin_label_tin[test_idx[ii]]]['cfar_fine_str'].replace(',', '')}, {pred_perc_fine[ii]:.2f}, {int(tin_label_fine[test_idx[ii]] == pred_fine[ii])}")
 
