@@ -1,0 +1,15 @@
+\newpage
+\section{Part C}
+\label{sec:sec_c}
+The \textit{CIFAR-100} dataset, contains both fine and coarse class labels. The dataset has 100 fine labels (used in the previous section) and 20 coarse classes. For this experiment the same procedure was applied as in Part B however the classifier was instead trained to learn the coarse labels.\
+
+Like before, the top-1 and top-5 accuracies are report in Figure~\ref{fig:coarse acc}. Unsurprisingly the accuracies increase across the board compared to the fine labels because this is a more forgiving classification problem. After 30 epochs the classifier had a top-5 test accuracy of 0.98 and a top-1 accuracy of 0.85.
+
+\begin{figure}[h]
+
+	\centering
+	\includegraphics[width=\textwidth]{figures/coarse\_acc.png}
+	\caption{Coarse Accuracies}
+	\label{fig:coarse acc}
+
+\end{figure}
