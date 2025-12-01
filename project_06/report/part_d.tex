@@ -17,21 +17,36 @@ Using the chosen labels as a subset of the \textit{Tiny-ImageNet} dataset, there
 		\toprule
 		\textbf{BrainNet} & \textbf{Top-1} & \textbf{Top-5} \\
 		\midrule
-		Fine & 0.62 & 0.77 \\ \hline
-		Coarse & 0.67 & 0.84 \\ \hline
+		Fine & 0.68 & 0.84 \\ \hline
+		Coarse & 0.74 & 0.92 \\ \hline
 	\end{tabular}
 	\caption{\textit{BrainNet} Accuracies}
 	\label{table:bn acc}
 \end{table}
 
-%For further result Figure~\ref{fig:coarse cm}
+For further results the confusion matrix was generated for the coarse labels in Figure~\ref{fig:coarse cm}. As can be seen the biggest issue was with the images labeled, either \textit{snail} or \textit{lobster} by the \textit{Tiny-ImageNet} dataset. They were frequently confused with the \textit{CIFAR-100} coarse label \textit{insects}. It is easy to imagine how those could be challenging for the classifier. For completeness the fine classification confusion matrix is attached in Figure~\ref{fig:fine cm}, however due to the number of classes it is difficult to read.
 
 \begin{figure}[h]
-	
 	\centering
 	\includegraphics[width=\textwidth]{figures/coarse\_cm.png}
 	\caption{Coarse Accuracies}
 	\label{fig:coarse cm}
-	
 \end{figure}
 
+Next we consider 100 randomly chosen images from the \textit{Tiny-ImageNet} dataset. The trail results are shown in Figure~\ref{fig:100 test}. From these 100 predictions, it was found that in the case of the coarse labels where teh model is correct the average confidence was 97.5\%, and 69.4\% when incorrect. For the fine model the average correct confidence was 99.2\% and 51.4\% when incorrect.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[height=\textheight]{figures/tiny-100.jpg}
+	\caption{100 \textit{Tiny-ImageNet} Test Points}
+	\label{fig:100 test}
+\end{figure}
+
+\begin{figure}[h]
+	
+	\centering
+	\includegraphics[width=\textwidth]{figures/fine\_cm.png}
+	\caption{Fine Accuracies}
+	\label{fig:fine cm}
+	
+\end{figure}
